@@ -8,6 +8,10 @@ interface User {
   restaurantId?: string;
   address?: string;
   phone?: string;
+  password?: string;
+  isApproved?: boolean;
+  restaurantName?: string;
+  restaurantImage?: string;
 }
 
 interface AuthContextType {
@@ -40,51 +44,92 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string, role?: string): Promise<boolean> => {
+  const mockUsers: User[] = [
+    {
+      id: '1',
+      name: 'Admin User',
+      email: 'admin@sbfoods.com',
+      role: 'admin',
+      password: 'admin123',
+    },
+    {
+      id: '2',
+      name: "McDonald's",
+      email: 'mcdonalds@restaurant.com',
+      role: 'restaurant',
+      password: 'restaurant123',
+      restaurantId: '1',
+      isApproved: true,
+      restaurantName: "McDonald's",
+      restaurantImage: 'https://example.com/mcdonalds.jpg',
+    },
+    {
+      id: '3',
+      name: 'John Doe',
+      email: 'john@user.com',
+      role: 'user',
+      password: 'user123',
+      address: 'Manikonda, Hyderabad',
+      phone: '+91 9876543210',
+    },
+  ];
+
+  const login = async (
+    email: string,
+    password: string,
+    role?: string
+  ): Promise<boolean> => {
     setIsLoading(true);
-    
-    // Mock login logic
-    const mockUsers = [
-      { id: '1', name: 'Admin User', email: 'admin@sbfoods.com', role: 'admin', password: 'admin123' },
-      { id: '2', name: 'McDonald\'s', email: 'mcdonalds@restaurant.com', role: 'restaurant', password: 'restaurant123', restaurantId: '1' },
-      { id: '3', name: 'John Doe', email: 'john@user.com', role: 'user', password: 'user123', address: 'Manikonda, Hyderabad', phone: '+91 9876543210' }
+
+    const registeredUsers: User[] = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    const approvedRestaurants: User[] = JSON.parse(localStorage.getItem('restaurants') || '[]');
+
+    const allUsers: User[] = [
+      ...mockUsers,
+      ...registeredUsers,
+      ...approvedRestaurants
     ];
 
-    const foundUser = mockUsers.find(u => u.email === email && u.password === password);
-    
+    const foundUser = allUsers.find(
+      u =>
+        u.email === email &&
+        u.password === password &&
+        (!role || u.role === role)
+    );
+
     if (foundUser) {
       const userData = { ...foundUser };
       delete userData.password;
-      setUser(userData as User);
+      setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
       setIsLoading(false);
       return true;
     }
-    
+
     setIsLoading(false);
     return false;
   };
 
   const register = async (userData: any): Promise<boolean> => {
     setIsLoading(true);
-    
-    // Mock registration logic
-    const newUser = {
+
+    const newUser: User = {
       id: Date.now().toString(),
       ...userData,
-      role: userData.role || 'user'
+      role: userData.role || 'user',
     };
 
-    if (userData.role === 'restaurant') {
-      // Add to pending approvals
+    if (newUser.role === 'restaurant') {
+      newUser.isApproved = false;
       const approvals = JSON.parse(localStorage.getItem('restaurantApprovals') || '[]');
       approvals.push(newUser);
       localStorage.setItem('restaurantApprovals', JSON.stringify(approvals));
     } else {
-      setUser(newUser);
-      localStorage.setItem('user', JSON.stringify(newUser));
+      const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      users.push(newUser);
+      localStorage.setItem('registeredUsers', JSON.stringify(users));
     }
-    
+
     setIsLoading(false);
     return true;
   };
@@ -95,8 +140,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{ user, login, register, logout, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
+
+
+
+
+

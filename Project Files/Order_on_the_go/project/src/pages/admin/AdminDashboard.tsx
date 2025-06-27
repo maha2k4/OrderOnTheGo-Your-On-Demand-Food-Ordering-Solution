@@ -20,11 +20,13 @@ const AdminDashboard: React.FC = () => {
     restaurants.map(r => ({ ...r, isPopular: r.isPopular }))
   );
 
+  // Load pending approvals from localStorage on first load
   useEffect(() => {
     const savedApprovals: Approval[] = JSON.parse(localStorage.getItem('restaurantApprovals') || '[]');
     setApprovals(savedApprovals);
   }, []);
 
+  // Keep local popular state in sync with global restaurant state
   useEffect(() => {
     setPopularRestaurants(restaurants.map(r => ({ ...r, isPopular: r.isPopular })));
   }, [restaurants]);
@@ -48,26 +50,16 @@ const AdminDashboard: React.FC = () => {
         };
 
         const updatedRestaurants = [...restaurants, newRestaurant];
+
+        // ✅ Update in context and localStorage
         updateRestaurants(updatedRestaurants);
+        localStorage.setItem('restaurants', JSON.stringify(updatedRestaurants));
         setPopularRestaurants(updatedRestaurants.map(r => ({ ...r, isPopular: r.isPopular })));
       }
     }
 
     setApprovals(updatedApprovals);
     localStorage.setItem('restaurantApprovals', JSON.stringify(updatedApprovals));
-  };
-
-  const handlePopularUpdate = () => {
-    const updatedRestaurants = restaurants.map(restaurant => {
-      const popularRestaurant = popularRestaurants.find(pr => pr.id === restaurant.id);
-      return {
-        ...restaurant,
-        isPopular: popularRestaurant ? popularRestaurant.isPopular : false
-      };
-    });
-
-    updateRestaurants(updatedRestaurants);
-    alert('Popular restaurants updated successfully!');
   };
 
   const togglePopular = (restaurantId: string) => {
@@ -80,7 +72,24 @@ const AdminDashboard: React.FC = () => {
     );
   };
 
-  const totalUsers = 25; // Static or mock data
+  const handlePopularUpdate = () => {
+    const updatedRestaurants = restaurants.map(restaurant => {
+      const popularRestaurant = popularRestaurants.find(pr => pr.id === restaurant.id);
+      return {
+        ...restaurant,
+        isPopular: popularRestaurant ? popularRestaurant.isPopular : false
+      };
+    });
+
+    updateRestaurants(updatedRestaurants);
+    localStorage.setItem('restaurants', JSON.stringify(updatedRestaurants)); // ✅ Persist updates
+    alert('Popular restaurants updated successfully!');
+  };
+
+  // Admin stats
+  const totalUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]')
+    .filter((u: any) => u.role === 'user').length;
+
   const approvedRestaurants = restaurants.filter(r => r.isApproved);
 
   return (
@@ -88,6 +97,7 @@ const AdminDashboard: React.FC = () => {
       <AdminNavbar />
 
       <div className="admin-content">
+        {/* STATS */}
         <div className="admin-stats">
           <div className="stat-card">
             <h3>Total users</h3>
@@ -123,6 +133,7 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
+        {/* POPULAR RESTAURANTS */}
         <div className="admin-sections">
           <div className="admin-section">
             <h3>Popular Restaurants (promotions)</h3>
@@ -143,6 +154,7 @@ const AdminDashboard: React.FC = () => {
             </button>
           </div>
 
+          {/* APPROVALS */}
           <div className="admin-section">
             <h3>Approvals</h3>
             <div className="approvals-list">
@@ -182,3 +194,4 @@ const AdminDashboard: React.FC = () => {
 };
 
 export default AdminDashboard;
+

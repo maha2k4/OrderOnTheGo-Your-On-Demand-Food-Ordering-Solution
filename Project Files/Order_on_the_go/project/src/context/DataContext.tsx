@@ -68,100 +68,106 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const categories = ['Breakfast', 'Biryani', 'Pizza', 'Noodles', 'Burger', 'Chinese', 'South Indian', 'North Indian'];
 
   useEffect(() => {
-    // Initialize with mock data
-    const mockRestaurants: Restaurant[] = [
-      {
-        id: '1',
-        name: 'McDonald\'s',
-        image: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg',
-        address: 'Manikonda, Hyderabad',
-        cuisine: 'Fast Food',
-        rating: 4.5,
-        isPopular: true,
-        isApproved: true,
-        items: [
-          {
-            id: '1',
-            name: 'Mc Maharaj',
-            description: 'Big size burger with chicken tikka and special sauce',
-            price: 175,
-            image: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg',
-            category: 'Burger',
-            restaurantId: '1'
-          },
-          {
-            id: '2',
-            name: 'French Fries',
-            description: 'Long French fries made from potato',
-            price: 134,
-            image: 'https://images.pexels.com/photos/1893556/pexels-photo-1893556.jpeg',
-            category: 'Sides',
-            restaurantId: '1'
-          },
-          {
-            id: '3',
-            name: 'Cold Coffee',
-            description: 'Tender coffee made from milk',
-            price: 201,
-            image: 'https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg',
-            category: 'Beverages',
-            restaurantId: '1'
-          },
-          {
-            id: '4',
-            name: 'Chicken Pizza',
-            description: 'Crispy pizza with tasty chicken',
-            price: 314,
-            image: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg',
-            category: 'Pizza',
-            restaurantId: '1'
-          }
-        ]
-      },
-      {
-        id: '2',
-        name: 'Andhra Spice',
-        image: 'https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg',
-        address: 'Gachibowli, Hyderabad',
-        cuisine: 'South Indian',
-        rating: 4.3,
-        isPopular: true,
-        isApproved: true,
-        items: []
-      },
-      {
-        id: '3',
-        name: 'Paradise Grand',
-        image: 'https://images.pexels.com/photos/2641886/pexels-photo-2641886.jpeg',
-        address: 'Banjara Hills, Hyderabad',
-        cuisine: 'Biryani',
-        rating: 4.7,
-        isPopular: false,
-        isApproved: true,
-        items: []
-      },
-      {
-        id: '4',
-        name: 'Minerva Grand',
-        image: 'https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg',
-        address: 'Kondapur, Hyderabad',
-        cuisine: 'Multi-cuisine',
-        rating: 4.2,
-        isPopular: false,
-        isApproved: true,
-        items: []
-      }
-    ];
+    // Load restaurants from localStorage if available
+    const savedRestaurants = localStorage.getItem('restaurants');
+    if (savedRestaurants) {
+      setRestaurants(JSON.parse(savedRestaurants));
+    } else {
+      const mockRestaurants: Restaurant[] = [
+        {
+          id: '1',
+          name: 'McDonald\'s',
+          image: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg',
+          address: 'Manikonda, Hyderabad',
+          cuisine: 'Fast Food',
+          rating: 4.5,
+          isPopular: true,
+          isApproved: true,
+          items: [
+            {
+              id: '1',
+              name: 'Mc Maharaj',
+              description: 'Big size burger with chicken tikka and special sauce',
+              price: 175,
+              image: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg',
+              category: 'Burger',
+              restaurantId: '1'
+            },
+            {
+              id: '2',
+              name: 'French Fries',
+              description: 'Long French fries made from potato',
+              price: 134,
+              image: 'https://images.pexels.com/photos/1893556/pexels-photo-1893556.jpeg',
+              category: 'Sides',
+              restaurantId: '1'
+            },
+            {
+              id: '3',
+              name: 'Cold Coffee',
+              description: 'Tender coffee made from milk',
+              price: 201,
+              image: 'https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg',
+              category: 'Beverages',
+              restaurantId: '1'
+            },
+            {
+              id: '4',
+              name: 'Chicken Pizza',
+              description: 'Crispy pizza with tasty chicken',
+              price: 314,
+              image: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg',
+              category: 'Pizza',
+              restaurantId: '1'
+            }
+          ]
+        },
+        {
+          id: '2',
+          name: 'Andhra Spice',
+          image: 'https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg',
+          address: 'Gachibowli, Hyderabad',
+          cuisine: 'South Indian',
+          rating: 4.3,
+          isPopular: true,
+          isApproved: true,
+          items: []
+        },
+        {
+          id: '3',
+          name: 'Paradise Grand',
+          image: 'https://images.pexels.com/photos/2641886/pexels-photo-2641886.jpeg',
+          address: 'Banjara Hills, Hyderabad',
+          cuisine: 'Biryani',
+          rating: 4.7,
+          isPopular: false,
+          isApproved: true,
+          items: []
+        },
+        {
+          id: '4',
+          name: 'Minerva Grand',
+          image: 'https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg',
+          address: 'Kondapur, Hyderabad',
+          cuisine: 'Multi-cuisine',
+          rating: 4.2,
+          isPopular: false,
+          isApproved: true,
+          items: []
+        }
+      ];
 
-    setRestaurants(mockRestaurants);
-    
-    // Load cart from localStorage
+      setRestaurants(mockRestaurants);
+      localStorage.setItem('restaurants', JSON.stringify(mockRestaurants));
+    }
+
+    // Load cart
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       setCartItems(JSON.parse(savedCart));
     }
 
-    // Load orders from localStorage
+    // Load orders
     const savedOrders = localStorage.getItem('orders');
     if (savedOrders) {
       setOrders(JSON.parse(savedOrders));
@@ -173,19 +179,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addToCart = (item: MenuItem) => {
     setCartItems(prev => {
       const existingItem = prev.find(cartItem => cartItem.id === item.id);
+      let updated;
       if (existingItem) {
-        const updated = prev.map(cartItem =>
+        updated = prev.map(cartItem =>
           cartItem.id === item.id
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
             : cartItem
         );
-        localStorage.setItem('cart', JSON.stringify(updated));
-        return updated;
       } else {
-        const updated = [...prev, { ...item, quantity: 1 }];
-        localStorage.setItem('cart', JSON.stringify(updated));
-        return updated;
+        updated = [...prev, { ...item, quantity: 1 }];
       }
+      localStorage.setItem('cart', JSON.stringify(updated));
+      return updated;
     });
   };
 
@@ -204,6 +209,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateRestaurants = (updatedRestaurants: Restaurant[]) => {
     setRestaurants(updatedRestaurants);
+    localStorage.setItem('restaurants', JSON.stringify(updatedRestaurants)); // ✅ persist!
   };
 
   const addOrder = (orderData: Omit<Order, 'id' | 'createdAt'>) => {
@@ -212,29 +218,31 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: Date.now().toString(),
       createdAt: new Date().toISOString()
     };
-    
+
     setOrders(prev => {
       const updated = [...prev, newOrder];
       localStorage.setItem('orders', JSON.stringify(updated));
       return updated;
     });
-    
+
     clearCart();
   };
 
   return (
-    <DataContext.Provider value={{
-      restaurants,
-      categories,
-      cartItems,
-      orders,
-      popularRestaurants,
-      addToCart,
-      removeFromCart,
-      clearCart,
-      updateRestaurants,
-      addOrder
-    }}>
+    <DataContext.Provider
+      value={{
+        restaurants,
+        categories,
+        cartItems,
+        orders,
+        popularRestaurants,
+        addToCart,
+        removeFromCart,
+        clearCart,
+        updateRestaurants,
+        addOrder
+      }}
+    >
       {children}
     </DataContext.Provider>
   );

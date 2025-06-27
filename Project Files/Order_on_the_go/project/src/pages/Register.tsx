@@ -1,46 +1,46 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Register: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     name: '',
     email: '',
     password: '',
-    role: 'user',
     address: '',
     phone: '',
-    restaurantImage: '',
-    cuisine: ''
+    role: 'user',
+    restaurantName: '',
+    restaurantImage: ''
   });
+
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
 
-    const success = await register(formData);
+    const { restaurantName, restaurantImage, ...rest } = form;
+    const payload =
+      form.role === 'restaurant'
+        ? { ...rest, restaurantName, restaurantImage }
+        : { ...rest }; // Remove restaurant fields for other roles
+
+    const success = await register(payload);
     if (success) {
-      if (formData.role === 'restaurant') {
-        setSuccess('Restaurant registration submitted for approval!');
-        setTimeout(() => navigate('/'), 2000);
-      } else {
-        navigate('/');
-      }
+      alert('Registration successful!');
+      navigate('/login');
     } else {
-      setError('Registration failed');
+      setError('Registration failed.');
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
   };
 
   return (
@@ -53,93 +53,85 @@ const Register: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="role">Register as:</label>
+            <label>Name:</label>
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Email:</label>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Password:</label>
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Phone:</label>
+            <input
+              type="text"
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Address:</label>
+            <input
+              type="text"
+              name="address"
+              value={form.address}
+              onChange={handleChange}
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Register as:</label>
             <select
               name="role"
-              id="role"
-              value={formData.role}
+              value={form.role}
               onChange={handleChange}
               className="form-select"
             >
               <option value="user">User</option>
               <option value="restaurant">Restaurant</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="name">{formData.role === 'restaurant' ? 'Restaurant Name' : 'Full Name'}:</label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email">Email:</label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password:</label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="address">Address:</label>
-            <textarea
-              name="address"
-              id="address"
-              value={formData.address}
-              onChange={handleChange}
-              className="form-textarea"
-              rows={3}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="phone">Phone:</label>
-            <input
-              type="tel"
-              name="phone"
-              id="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-
-          {formData.role === 'restaurant' && (
+          {form.role === 'restaurant' && (
             <>
               <div className="form-group">
-                <label htmlFor="restaurantImage">Restaurant Image URL:</label>
+                <label>Restaurant Name:</label>
                 <input
-                  type="url"
-                  name="restaurantImage"
-                  id="restaurantImage"
-                  value={formData.restaurantImage}
+                  type="text"
+                  name="restaurantName"
+                  value={form.restaurantName}
                   onChange={handleChange}
                   className="form-input"
                   required
@@ -147,15 +139,13 @@ const Register: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="cuisine">Cuisine Type:</label>
+                <label>Restaurant Image URL:</label>
                 <input
                   type="text"
-                  name="cuisine"
-                  id="cuisine"
-                  value={formData.cuisine}
+                  name="restaurantImage"
+                  value={form.restaurantImage}
                   onChange={handleChange}
                   className="form-input"
-                  placeholder="e.g., Fast Food, Indian, Chinese"
                   required
                 />
               </div>
@@ -163,7 +153,6 @@ const Register: React.FC = () => {
           )}
 
           {error && <div className="error-message">{error}</div>}
-          {success && <div className="success-message">{success}</div>}
 
           <button type="submit" className="auth-button">
             Register
@@ -179,3 +168,7 @@ const Register: React.FC = () => {
 };
 
 export default Register;
+
+
+
+
